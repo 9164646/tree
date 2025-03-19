@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Multiple Calculators - Calculator.in</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: #ffffff;
+            border: 1px solid #007bff;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            color: #ffffff;
+            background: #007bff;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        input {
+            width: 100%;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            border-color: #0056b3;
+        }
+        .btn-calculate, .btn-danger {
+            width: 48%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .btn-calculate {
+            background: #007bff;
+            color: white;
+        }
+        .btn-calculate:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #b02a37;
+            transform: scale(1.05);
+        }
+        .result {
+            background: #e9f2ff;
+            padding: 15px;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 1.1rem;
+            color: #0056b3;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s forwards;
+        }
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">Multiple Calculators</div>
+
+        <select id="calculatorSelector" class="form-select mb-4" onchange="showCalculator()">
+            <option value="age">Age Calculator</option>
+            <option value="bmi">BMI Calculator</option>
+            <option value="ibm">IBM Calculator</option>
+            <option value="interest">Interest Calculator</option>
+            <option value="monthlyInterest">Monthly Interest Calculator</option>
+        </select>
+
+        <!-- Calculators -->
+        <div id="calculators"></div>
+    </div>
+
+    <script>
+        function showCalculator() {
+            const calculators = document.getElementById('calculators');
+            calculators.innerHTML = ''; // Clear previous calculator
+            const selectedCalculator = document.getElementById('calculatorSelector').value;
+
+            let html = '';
+
+            switch (selectedCalculator) {
+                case 'age':
+                    html = `
+                        <h4>Age Calculator</h4>
+                        <input type="date" id="dob">
+                        ${generateButtons('calculateAge()')}
+                        <div id="ageResult" class="result"></div>`;
+                    break;
+
+                case 'bmi':
+                    html = `
+                        <h4>BMI Calculator</h4>
+                        <input type="number" id="bmiWeight" placeholder="Weight (kg)" min="1">
+                        <input type="number" id="bmiHeight" placeholder="Height (m)" step="0.01" min="0.1">
+                        ${generateButtons('calculateBMI()')}
+                        <div id="bmiResult" class="result"></div>`;
+                    break;
+
+                case 'ibm':
+                    html = `
+                        <h4>IBM Calculator</h4>
+                        <input type="number" id="ibmValue" placeholder="Enter IBM Value" min="0">
+                        ${generateButtons('calculateIBM()')}
+                        <div id="ibmResult" class="result"></div>`;
+                    break;
+
+                case 'interest':
+                    html = `
+                        <h4>Interest Calculator</h4>
+                        <input type="number" id="principal" placeholder="Principal Amount" min="0">
+                        <input type="number" id="rate" placeholder="Rate of Interest (%)" step="0.01" min="0">
+                        <input type="number" id="time" placeholder="Time (Years)" min="0">
+                        ${generateButtons('calculateInterest()')}
+                        <div id="interestResult" class="result"></div>`;
+                    break;
+
+                case 'monthlyInterest':
+                    html = `
+                        <h4>Monthly Interest Calculator</h4>
+                        <input type="number" id="monthlyPrincipal" placeholder="Principal Amount" min="0">
+                        <input type="number" id="monthlyRate" placeholder="Monthly Interest Rate (%)" step="0.01" min="0">
+                        ${generateButtons('calculateMonthlyInterest()')}
+                        <div id="monthlyInterestResult" class="result"></div>`;
+                    break;
+            }
+
+            calculators.innerHTML = html;
+        }
+
+        function generateButtons(calculationFunction) {
+            return `
+                <button class="btn-calculate" onclick="${calculationFunction}">Calculate</button>
+                <button class="btn-danger" onclick="restartCalculator()">Restart Test</button>
+            `;
+        }
+
+        function restartCalculator() {
+            showCalculator();
+        }
+
+        function calculateAge() {
+            const dob = new Date(document.getElementById("dob").value);
+            if (!dob) return alert("Please enter a valid date.");
+            const today = new Date();
+            const age = today.getFullYear() - dob.getFullYear();
+            document.getElementById("ageResult").innerText = `You are ${age} years old.`;
+        }
+
+        function calculateBMI() {
+            const weight = parseFloat(document.getElementById("bmiWeight").value);
+            const height = parseFloat(document.getElementById("bmiHeight").value);
+            if (weight && height) {
+                const bmi = weight / (height * height);
+                document.getElementById("bmiResult").innerText = `Your BMI is ${bmi.toFixed(2)}.`;
+            } else alert("Please enter valid inputs.");
+        }
+
+        function calculateIBM() {
+            const ibmValue = parseFloat(document.getElementById("ibmValue").value);
+            if (!isNaN(ibmValue)) {
+                document.getElementById("ibmResult").innerText = `IBM Value: ${ibmValue.toFixed(2)}`;
+            } else alert("Please enter a valid IBM value.");
+        }
+
+        function calculateInterest() {
+            const p = parseFloat(document.getElementById("principal").value);
+            const r = parseFloat(document.getElementById("rate").value);
+            const t = parseFloat(document.getElementById("time").value);
+            if (p && r && t) {
+                const interest = (p * r * t) / 100;
+                document.getElementById("interestResult").innerText = `Interest: ${interest.toFixed(2)}.`;
+            } else alert("Please enter valid inputs.");
+        }
+
+        function calculateMonthlyInterest() {
+            calculateInterest();
+        }
+
+        window.onload = showCalculator;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
